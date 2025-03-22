@@ -16,6 +16,9 @@
             <column name="weather_phenomenon" type="VARCHAR(255)"/>
             <column name="observation_time" type="TIMESTAMP"/>
         </createTable>
+        <rollback>
+            <dropTable tableName="weather_info"/>
+        </rollback>
     </changeSet>
     
     <changeSet id="21-03-2025 create base fee table" author="Faina">
@@ -33,6 +36,9 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <rollback>
+            <dropTable tableName="base_fees"/>
+        </rollback>
     </changeSet>
     
     <changeSet id="21-03-2025 insert data into base fee table" author="Faina">
@@ -81,5 +87,8 @@
             <column name="vehicle_type" value="Bike"/>
             <column name="base_fee" value="2.0"/>
         </insert>
+        <rollback>
+            <delete tableName="base_fees"/>
+        </rollback>
     </changeSet>
 </databaseChangeLog>
