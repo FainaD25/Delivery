@@ -34,4 +34,6 @@ java -jar .\build\libs\Delivery-0.0.1-SNAPSHOT.jar
 4. Access the database console at http://localhost:8080/h2-console/
 JDBC URL: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
 username: sa
-leave the password field empty 
+leave the password field empty <br>
+
+After running the application, the documentation can be seen at http://localhost:8080/swagger-ui.html
