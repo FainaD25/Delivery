@@ -18,8 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,34 +31,54 @@ class DeliveryServiceTest {
     @InjectMocks
     private DeliveryService deliveryService;
 
+    private BaseFeeEntity tallinnCarBaseFee;
+    private BaseFeeEntity tallinnScooterBaseFee;
+    private BaseFeeEntity tallinnBikeBaseFee;
+    private BaseFeeEntity tartuCarBaseFee;
+    private BaseFeeEntity tartuScooterBaseFee;
+    private BaseFeeEntity tartuBikeBaseFee;
+    private BaseFeeEntity parnuCarBaseFee;
+    private BaseFeeEntity parnuScooterBaseFee;
+    private BaseFeeEntity parnuBikeBaseFee;
+
     @BeforeEach
     void setUp() {
         deliveryService = new DeliveryService(weatherRepository, baseFeeRepository);
+
+        tallinnCarBaseFee = createBaseFeeEntity("Tallinn", "Car" , 4.0);
+        tallinnScooterBaseFee = createBaseFeeEntity("Tallinn", "Scooter" , 3.5);
+        tallinnBikeBaseFee = createBaseFeeEntity("Tallinn", "Bike" , 3.0);
+
+        tartuCarBaseFee = createBaseFeeEntity("Tartu", "Car", 3.5);
+        tartuScooterBaseFee = createBaseFeeEntity("Tartu", "Scooter", 3.0);
+        tartuBikeBaseFee = createBaseFeeEntity("Tartu", "Bike", 2.5);
+
+        parnuCarBaseFee = createBaseFeeEntity("Pärnu", "Car", 3.0);
+        parnuScooterBaseFee = createBaseFeeEntity("Pärnu", "Scooter", 2.5);
+        parnuBikeBaseFee = createBaseFeeEntity("Pärnu","Bike", 2.0);
+    }
+
+    private WeatherEntity createWeatherEntity(String stationName, double temperature, double windSpeed, String phenomenon) {
+        WeatherEntity entity = new WeatherEntity();
+        entity.setStationName(stationName);
+        entity.setAirTemperature(temperature);
+        entity.setWindSpeed(windSpeed);
+        entity.setWeatherPhenomenon(phenomenon);
+        entity.setTimestamp(LocalDateTime.now());
+        return entity;
+    }
+
+    private BaseFeeEntity createBaseFeeEntity(String city, String vehicleType, double baseFee) {
+        BaseFeeEntity baseFeeEntity = new BaseFeeEntity();
+        baseFeeEntity.setCity(city);
+        baseFeeEntity.setVehicleType(vehicleType);
+        baseFeeEntity.setBaseFee(baseFee);
+        return baseFeeEntity;
     }
 
     @Test
     void testCalculateFee_Tallinn_NormalConditions() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Tallinn-Harku");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Clear");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity tallinnCarBaseFee = new BaseFeeEntity();
-        tallinnCarBaseFee.setCity("Tallinn");
-        tallinnCarBaseFee.setVehicleType("Car");
-        tallinnCarBaseFee.setBaseFee(4.0);
-
-        BaseFeeEntity tallinnScooterBaseFee = new BaseFeeEntity();
-        tallinnScooterBaseFee.setCity("Tallinn");
-        tallinnScooterBaseFee.setVehicleType("Scooter");
-        tallinnScooterBaseFee.setBaseFee(3.5);
-
-        BaseFeeEntity tallinnBikeBaseFee = new BaseFeeEntity();
-        tallinnBikeBaseFee.setCity("Tallinn");
-        tallinnBikeBaseFee.setVehicleType("Bike");
-        tallinnBikeBaseFee.setBaseFee(3.0);
+        WeatherEntity entity = createWeatherEntity("Tallinn-Harku", 5, 5, "Clear");
 
         when(weatherRepository.findLatestByStationName("Tallinn-Harku")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Tallinn", "Car")).thenReturn(Optional.of(tallinnCarBaseFee));
@@ -75,28 +93,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Tartu_NormalConditions() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Tartu-Tõravere");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Clear");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity tartuCarBaseFee = new BaseFeeEntity();
-        tartuCarBaseFee.setCity("Tartu");
-        tartuCarBaseFee.setVehicleType("Car");
-        tartuCarBaseFee.setBaseFee(3.5);
-
-        BaseFeeEntity tartuScooterBaseFee = new BaseFeeEntity();
-        tartuScooterBaseFee.setCity("Tartu");
-        tartuScooterBaseFee.setVehicleType("Scooter");
-        tartuScooterBaseFee.setBaseFee(3.0);
-
-        BaseFeeEntity tartuBikeBaseFee = new BaseFeeEntity();
-        tartuBikeBaseFee.setCity("Tartu");
-        tartuBikeBaseFee.setVehicleType("Bike");
-        tartuBikeBaseFee.setBaseFee(2.5);
-
+        WeatherEntity entity = createWeatherEntity("Tartu-Tõravere", 5, 5, "Clear");
 
         when(weatherRepository.findLatestByStationName("Tartu-Tõravere")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Tartu", "Car")).thenReturn(Optional.of(tartuCarBaseFee));
@@ -110,28 +107,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Parnu_NormalConditions() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Pärnu");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Clear");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity parnuCarBaseFee = new BaseFeeEntity();
-        parnuCarBaseFee.setCity("Pärnu");
-        parnuCarBaseFee.setVehicleType("Car");
-        parnuCarBaseFee.setBaseFee(3.0);
-
-        BaseFeeEntity parnuScooterBaseFee = new BaseFeeEntity();
-        parnuScooterBaseFee.setCity("Pärnu");
-        parnuScooterBaseFee.setVehicleType("Scooter");
-        parnuScooterBaseFee.setBaseFee(2.5);
-
-        BaseFeeEntity parnuBikeBaseFee = new BaseFeeEntity();
-        parnuBikeBaseFee.setCity("Pärnu");
-        parnuBikeBaseFee.setVehicleType("Bike");
-        parnuBikeBaseFee.setBaseFee(2.0);
-
+        WeatherEntity entity = createWeatherEntity("Pärnu", 5, 5, "Clear");
 
         when(weatherRepository.findLatestByStationName("Pärnu")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Pärnu", "Car")).thenReturn(Optional.of(parnuCarBaseFee));
@@ -145,27 +121,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Tallinn_LowTemperature() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Tallinn-Harku");
-        entity.setAirTemperature(-5);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Clear");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity tallinnCarBaseFee = new BaseFeeEntity();
-        tallinnCarBaseFee.setCity("Tallinn");
-        tallinnCarBaseFee.setVehicleType("Car");
-        tallinnCarBaseFee.setBaseFee(4.0);
-
-        BaseFeeEntity tallinnScooterBaseFee = new BaseFeeEntity();
-        tallinnScooterBaseFee.setCity("Tallinn");
-        tallinnScooterBaseFee.setVehicleType("Scooter");
-        tallinnScooterBaseFee.setBaseFee(3.5);
-
-        BaseFeeEntity tallinnBikeBaseFee = new BaseFeeEntity();
-        tallinnBikeBaseFee.setCity("Tallinn");
-        tallinnBikeBaseFee.setVehicleType("Bike");
-        tallinnBikeBaseFee.setBaseFee(3.0);
+        WeatherEntity entity = createWeatherEntity("Tallinn-Harku", -10, 5, "Clear");
 
         when(weatherRepository.findLatestByStationName("Tallinn-Harku")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Tallinn", "Car")).thenReturn(Optional.of(tallinnCarBaseFee));
@@ -180,28 +136,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Tartu_LowTemperature() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Tartu-Tõravere");
-        entity.setAirTemperature(-5);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Clear");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity tartuCarBaseFee = new BaseFeeEntity();
-        tartuCarBaseFee.setCity("Tartu");
-        tartuCarBaseFee.setVehicleType("Car");
-        tartuCarBaseFee.setBaseFee(3.5);
-
-        BaseFeeEntity tartuScooterBaseFee = new BaseFeeEntity();
-        tartuScooterBaseFee.setCity("Tartu");
-        tartuScooterBaseFee.setVehicleType("Scooter");
-        tartuScooterBaseFee.setBaseFee(3.0);
-
-        BaseFeeEntity tartuBikeBaseFee = new BaseFeeEntity();
-        tartuBikeBaseFee.setCity("Tartu");
-        tartuBikeBaseFee.setVehicleType("Bike");
-        tartuBikeBaseFee.setBaseFee(2.5);
-
+        WeatherEntity entity = createWeatherEntity("Tartu-Tõravere", 0, 5, "Clear");
 
         when(weatherRepository.findLatestByStationName("Tartu-Tõravere")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Tartu", "Car")).thenReturn(Optional.of(tartuCarBaseFee));
@@ -215,27 +150,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Parnu_LowTemperature() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Pärnu");
-        entity.setAirTemperature(-5);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Clear");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity parnuCarBaseFee = new BaseFeeEntity();
-        parnuCarBaseFee.setCity("Pärnu");
-        parnuCarBaseFee.setVehicleType("Car");
-        parnuCarBaseFee.setBaseFee(3.0);
-
-        BaseFeeEntity parnuScooterBaseFee = new BaseFeeEntity();
-        parnuScooterBaseFee.setCity("Pärnu");
-        parnuScooterBaseFee.setVehicleType("Scooter");
-        parnuScooterBaseFee.setBaseFee(2.5);
-
-        BaseFeeEntity parnuBikeBaseFee = new BaseFeeEntity();
-        parnuBikeBaseFee.setCity("Pärnu");
-        parnuBikeBaseFee.setVehicleType("Bike");
-        parnuBikeBaseFee.setBaseFee(2.0);
+        WeatherEntity entity = createWeatherEntity("Pärnu", -5, 5, "Clear");
 
         when(weatherRepository.findLatestByStationName("Pärnu")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Pärnu", "Car")).thenReturn(Optional.of(parnuCarBaseFee));
@@ -249,27 +164,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Tallinn_VeryLowTemperature() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Tallinn-Harku");
-        entity.setAirTemperature(-15);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Clear");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity tallinnCarBaseFee = new BaseFeeEntity();
-        tallinnCarBaseFee.setCity("Tallinn");
-        tallinnCarBaseFee.setVehicleType("Car");
-        tallinnCarBaseFee.setBaseFee(4.0);
-
-        BaseFeeEntity tallinnScooterBaseFee = new BaseFeeEntity();
-        tallinnScooterBaseFee.setCity("Tallinn");
-        tallinnScooterBaseFee.setVehicleType("Scooter");
-        tallinnScooterBaseFee.setBaseFee(3.5);
-
-        BaseFeeEntity tallinnBikeBaseFee = new BaseFeeEntity();
-        tallinnBikeBaseFee.setCity("Tallinn");
-        tallinnBikeBaseFee.setVehicleType("Bike");
-        tallinnBikeBaseFee.setBaseFee(3.0);
+        WeatherEntity entity = createWeatherEntity("Tallinn-Harku", -15, 5, "Clear");
 
         when(weatherRepository.findLatestByStationName("Tallinn-Harku")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Tallinn", "Car")).thenReturn(Optional.of(tallinnCarBaseFee));
@@ -284,28 +179,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Tartu_VeryLowTemperature() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Tartu-Tõravere");
-        entity.setAirTemperature(-15);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Clear");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity tartuCarBaseFee = new BaseFeeEntity();
-        tartuCarBaseFee.setCity("Tartu");
-        tartuCarBaseFee.setVehicleType("Car");
-        tartuCarBaseFee.setBaseFee(3.5);
-
-        BaseFeeEntity tartuScooterBaseFee = new BaseFeeEntity();
-        tartuScooterBaseFee.setCity("Tartu");
-        tartuScooterBaseFee.setVehicleType("Scooter");
-        tartuScooterBaseFee.setBaseFee(3.0);
-
-        BaseFeeEntity tartuBikeBaseFee = new BaseFeeEntity();
-        tartuBikeBaseFee.setCity("Tartu");
-        tartuBikeBaseFee.setVehicleType("Bike");
-        tartuBikeBaseFee.setBaseFee(2.5);
-
+        WeatherEntity entity = createWeatherEntity("Tartu-Tõravere", -15, 5, "Clear");
 
         when(weatherRepository.findLatestByStationName("Tartu-Tõravere")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Tartu", "Car")).thenReturn(Optional.of(tartuCarBaseFee));
@@ -319,27 +193,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Parnu_VeryLowTemperature() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Pärnu");
-        entity.setAirTemperature(-15);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Clear");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity parnuCarBaseFee = new BaseFeeEntity();
-        parnuCarBaseFee.setCity("Pärnu");
-        parnuCarBaseFee.setVehicleType("Car");
-        parnuCarBaseFee.setBaseFee(3.0);
-
-        BaseFeeEntity parnuScooterBaseFee = new BaseFeeEntity();
-        parnuScooterBaseFee.setCity("Pärnu");
-        parnuScooterBaseFee.setVehicleType("Scooter");
-        parnuScooterBaseFee.setBaseFee(2.5);
-
-        BaseFeeEntity parnuBikeBaseFee = new BaseFeeEntity();
-        parnuBikeBaseFee.setCity("Pärnu");
-        parnuBikeBaseFee.setVehicleType("Bike");
-        parnuBikeBaseFee.setBaseFee(2.0);
+        WeatherEntity entity = createWeatherEntity("Pärnu", -15, 5, "Clear");
 
         when(weatherRepository.findLatestByStationName("Pärnu")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Pärnu", "Car")).thenReturn(Optional.of(parnuCarBaseFee));
@@ -353,27 +207,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Tallinn_StrongWind() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Tallinn-Harku");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(15);
-        entity.setWeatherPhenomenon("Clear");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity tallinnCarBaseFee = new BaseFeeEntity();
-        tallinnCarBaseFee.setCity("Tallinn");
-        tallinnCarBaseFee.setVehicleType("Car");
-        tallinnCarBaseFee.setBaseFee(4.0);
-
-        BaseFeeEntity tallinnScooterBaseFee = new BaseFeeEntity();
-        tallinnScooterBaseFee.setCity("Tallinn");
-        tallinnScooterBaseFee.setVehicleType("Scooter");
-        tallinnScooterBaseFee.setBaseFee(3.5);
-
-        BaseFeeEntity tallinnBikeBaseFee = new BaseFeeEntity();
-        tallinnBikeBaseFee.setCity("Tallinn");
-        tallinnBikeBaseFee.setVehicleType("Bike");
-        tallinnBikeBaseFee.setBaseFee(3.0);
+        WeatherEntity entity = createWeatherEntity("Tallinn-Harku", 5, 10, "Clear");
 
         when(weatherRepository.findLatestByStationName("Tallinn-Harku")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Tallinn", "Car")).thenReturn(Optional.of(tallinnCarBaseFee));
@@ -388,28 +222,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Tartu_StrongWind() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Tartu-Tõravere");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(15);
-        entity.setWeatherPhenomenon("Clear");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity tartuCarBaseFee = new BaseFeeEntity();
-        tartuCarBaseFee.setCity("Tartu");
-        tartuCarBaseFee.setVehicleType("Car");
-        tartuCarBaseFee.setBaseFee(3.5);
-
-        BaseFeeEntity tartuScooterBaseFee = new BaseFeeEntity();
-        tartuScooterBaseFee.setCity("Tartu");
-        tartuScooterBaseFee.setVehicleType("Scooter");
-        tartuScooterBaseFee.setBaseFee(3.0);
-
-        BaseFeeEntity tartuBikeBaseFee = new BaseFeeEntity();
-        tartuBikeBaseFee.setCity("Tartu");
-        tartuBikeBaseFee.setVehicleType("Bike");
-        tartuBikeBaseFee.setBaseFee(2.5);
-
+        WeatherEntity entity = createWeatherEntity("Tartu-Tõravere", 5, 15, "Clear");
 
         when(weatherRepository.findLatestByStationName("Tartu-Tõravere")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Tartu", "Car")).thenReturn(Optional.of(tartuCarBaseFee));
@@ -423,27 +236,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Parnu_StrongWind() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Pärnu");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(15);
-        entity.setWeatherPhenomenon("Clear");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity parnuCarBaseFee = new BaseFeeEntity();
-        parnuCarBaseFee.setCity("Pärnu");
-        parnuCarBaseFee.setVehicleType("Car");
-        parnuCarBaseFee.setBaseFee(3.0);
-
-        BaseFeeEntity parnuScooterBaseFee = new BaseFeeEntity();
-        parnuScooterBaseFee.setCity("Pärnu");
-        parnuScooterBaseFee.setVehicleType("Scooter");
-        parnuScooterBaseFee.setBaseFee(2.5);
-
-        BaseFeeEntity parnuBikeBaseFee = new BaseFeeEntity();
-        parnuBikeBaseFee.setCity("Pärnu");
-        parnuBikeBaseFee.setVehicleType("Bike");
-        parnuBikeBaseFee.setBaseFee(2.0);
+        WeatherEntity entity = createWeatherEntity("Pärnu", 5, 20, "Clear");
 
         when(weatherRepository.findLatestByStationName("Pärnu")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Pärnu", "Car")).thenReturn(Optional.of(parnuCarBaseFee));
@@ -457,27 +250,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Tallinn_VeryStrongWind() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Tallinn-Harku");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(25);
-        entity.setWeatherPhenomenon("Clear");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity tallinnCarBaseFee = new BaseFeeEntity();
-        tallinnCarBaseFee.setCity("Tallinn");
-        tallinnCarBaseFee.setVehicleType("Car");
-        tallinnCarBaseFee.setBaseFee(4.0);
-
-        BaseFeeEntity tallinnScooterBaseFee = new BaseFeeEntity();
-        tallinnScooterBaseFee.setCity("Tallinn");
-        tallinnScooterBaseFee.setVehicleType("Scooter");
-        tallinnScooterBaseFee.setBaseFee(3.5);
-
-        BaseFeeEntity tallinnBikeBaseFee = new BaseFeeEntity();
-        tallinnBikeBaseFee.setCity("Tallinn");
-        tallinnBikeBaseFee.setVehicleType("Bike");
-        tallinnBikeBaseFee.setBaseFee(3.0);
+        WeatherEntity entity = createWeatherEntity("Tallinn-Harku", 5, 25, "Clear");
 
         when(weatherRepository.findLatestByStationName("Tallinn-Harku")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Tallinn", "Car")).thenReturn(Optional.of(tallinnCarBaseFee));
@@ -492,28 +265,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Tartu_VeryStrongWind() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Tartu-Tõravere");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(25);
-        entity.setWeatherPhenomenon("Clear");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity tartuCarBaseFee = new BaseFeeEntity();
-        tartuCarBaseFee.setCity("Tartu");
-        tartuCarBaseFee.setVehicleType("Car");
-        tartuCarBaseFee.setBaseFee(3.5);
-
-        BaseFeeEntity tartuScooterBaseFee = new BaseFeeEntity();
-        tartuScooterBaseFee.setCity("Tartu");
-        tartuScooterBaseFee.setVehicleType("Scooter");
-        tartuScooterBaseFee.setBaseFee(3.0);
-
-        BaseFeeEntity tartuBikeBaseFee = new BaseFeeEntity();
-        tartuBikeBaseFee.setCity("Tartu");
-        tartuBikeBaseFee.setVehicleType("Bike");
-        tartuBikeBaseFee.setBaseFee(2.5);
-
+        WeatherEntity entity = createWeatherEntity("Tartu-Tõravere", 5, 25, "Clear");
 
         when(weatherRepository.findLatestByStationName("Tartu-Tõravere")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Tartu", "Car")).thenReturn(Optional.of(tartuCarBaseFee));
@@ -528,27 +280,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Parnu_VeryStrongWind() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Pärnu");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(25);
-        entity.setWeatherPhenomenon("Clear");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity parnuCarBaseFee = new BaseFeeEntity();
-        parnuCarBaseFee.setCity("Pärnu");
-        parnuCarBaseFee.setVehicleType("Car");
-        parnuCarBaseFee.setBaseFee(3.0);
-
-        BaseFeeEntity parnuScooterBaseFee = new BaseFeeEntity();
-        parnuScooterBaseFee.setCity("Pärnu");
-        parnuScooterBaseFee.setVehicleType("Scooter");
-        parnuScooterBaseFee.setBaseFee(2.5);
-
-        BaseFeeEntity parnuBikeBaseFee = new BaseFeeEntity();
-        parnuBikeBaseFee.setCity("Pärnu");
-        parnuBikeBaseFee.setVehicleType("Bike");
-        parnuBikeBaseFee.setBaseFee(2.0);
+        WeatherEntity entity = createWeatherEntity("Pärnu", 5, 25, "Clear");
 
         when(weatherRepository.findLatestByStationName("Pärnu")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Pärnu", "Car")).thenReturn(Optional.of(parnuCarBaseFee));
@@ -563,27 +295,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Tallinn_SnowOrSleet() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Tallinn-Harku");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Moderate snowfall");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity tallinnCarBaseFee = new BaseFeeEntity();
-        tallinnCarBaseFee.setCity("Tallinn");
-        tallinnCarBaseFee.setVehicleType("Car");
-        tallinnCarBaseFee.setBaseFee(4.0);
-
-        BaseFeeEntity tallinnScooterBaseFee = new BaseFeeEntity();
-        tallinnScooterBaseFee.setCity("Tallinn");
-        tallinnScooterBaseFee.setVehicleType("Scooter");
-        tallinnScooterBaseFee.setBaseFee(3.5);
-
-        BaseFeeEntity tallinnBikeBaseFee = new BaseFeeEntity();
-        tallinnBikeBaseFee.setCity("Tallinn");
-        tallinnBikeBaseFee.setVehicleType("Bike");
-        tallinnBikeBaseFee.setBaseFee(3.0);
+        WeatherEntity entity = createWeatherEntity("Tallinn-Harku", 5, 5, "Moderate snowfall");
 
         when(weatherRepository.findLatestByStationName("Tallinn-Harku")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Tallinn", "Car")).thenReturn(Optional.of(tallinnCarBaseFee));
@@ -598,28 +310,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Tartu_SnowOrSleet() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Tartu-Tõravere");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Light sleet");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity tartuCarBaseFee = new BaseFeeEntity();
-        tartuCarBaseFee.setCity("Tartu");
-        tartuCarBaseFee.setVehicleType("Car");
-        tartuCarBaseFee.setBaseFee(3.5);
-
-        BaseFeeEntity tartuScooterBaseFee = new BaseFeeEntity();
-        tartuScooterBaseFee.setCity("Tartu");
-        tartuScooterBaseFee.setVehicleType("Scooter");
-        tartuScooterBaseFee.setBaseFee(3.0);
-
-        BaseFeeEntity tartuBikeBaseFee = new BaseFeeEntity();
-        tartuBikeBaseFee.setCity("Tartu");
-        tartuBikeBaseFee.setVehicleType("Bike");
-        tartuBikeBaseFee.setBaseFee(2.5);
-
+        WeatherEntity entity = createWeatherEntity("Tartu-Tõravere", 5, 5, "Light sleet");
 
         when(weatherRepository.findLatestByStationName("Tartu-Tõravere")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Tartu", "Car")).thenReturn(Optional.of(tartuCarBaseFee));
@@ -633,27 +324,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Parnu_SnowOrSleet() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Pärnu");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Heavy snowfall");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity parnuCarBaseFee = new BaseFeeEntity();
-        parnuCarBaseFee.setCity("Pärnu");
-        parnuCarBaseFee.setVehicleType("Car");
-        parnuCarBaseFee.setBaseFee(3.0);
-
-        BaseFeeEntity parnuScooterBaseFee = new BaseFeeEntity();
-        parnuScooterBaseFee.setCity("Pärnu");
-        parnuScooterBaseFee.setVehicleType("Scooter");
-        parnuScooterBaseFee.setBaseFee(2.5);
-
-        BaseFeeEntity parnuBikeBaseFee = new BaseFeeEntity();
-        parnuBikeBaseFee.setCity("Pärnu");
-        parnuBikeBaseFee.setVehicleType("Bike");
-        parnuBikeBaseFee.setBaseFee(2.0);
+        WeatherEntity entity = createWeatherEntity("Pärnu", 5, 5, "Heavy snowfall");
 
         when(weatherRepository.findLatestByStationName("Pärnu")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Pärnu", "Car")).thenReturn(Optional.of(parnuCarBaseFee));
@@ -667,27 +338,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Tallinn_Rain() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Tallinn-Harku");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Light rain");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity tallinnCarBaseFee = new BaseFeeEntity();
-        tallinnCarBaseFee.setCity("Tallinn");
-        tallinnCarBaseFee.setVehicleType("Car");
-        tallinnCarBaseFee.setBaseFee(4.0);
-
-        BaseFeeEntity tallinnScooterBaseFee = new BaseFeeEntity();
-        tallinnScooterBaseFee.setCity("Tallinn");
-        tallinnScooterBaseFee.setVehicleType("Scooter");
-        tallinnScooterBaseFee.setBaseFee(3.5);
-
-        BaseFeeEntity tallinnBikeBaseFee = new BaseFeeEntity();
-        tallinnBikeBaseFee.setCity("Tallinn");
-        tallinnBikeBaseFee.setVehicleType("Bike");
-        tallinnBikeBaseFee.setBaseFee(3.0);
+        WeatherEntity entity = createWeatherEntity("Tallinn-Harku", 5, 5, "Light rain");
 
         when(weatherRepository.findLatestByStationName("Tallinn-Harku")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Tallinn", "Car")).thenReturn(Optional.of(tallinnCarBaseFee));
@@ -702,28 +353,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Tartu_Rain() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Tartu-Tõravere");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Moderate rain");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity tartuCarBaseFee = new BaseFeeEntity();
-        tartuCarBaseFee.setCity("Tartu");
-        tartuCarBaseFee.setVehicleType("Car");
-        tartuCarBaseFee.setBaseFee(3.5);
-
-        BaseFeeEntity tartuScooterBaseFee = new BaseFeeEntity();
-        tartuScooterBaseFee.setCity("Tartu");
-        tartuScooterBaseFee.setVehicleType("Scooter");
-        tartuScooterBaseFee.setBaseFee(3.0);
-
-        BaseFeeEntity tartuBikeBaseFee = new BaseFeeEntity();
-        tartuBikeBaseFee.setCity("Tartu");
-        tartuBikeBaseFee.setVehicleType("Bike");
-        tartuBikeBaseFee.setBaseFee(2.5);
-
+        WeatherEntity entity = createWeatherEntity("Tartu-Tõravere", 5, 5, "Moderate rain");
 
         when(weatherRepository.findLatestByStationName("Tartu-Tõravere")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Tartu", "Car")).thenReturn(Optional.of(tartuCarBaseFee));
@@ -737,27 +367,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Parnu_Rain() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Pärnu");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Heavy rain");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity parnuCarBaseFee = new BaseFeeEntity();
-        parnuCarBaseFee.setCity("Pärnu");
-        parnuCarBaseFee.setVehicleType("Car");
-        parnuCarBaseFee.setBaseFee(3.0);
-
-        BaseFeeEntity parnuScooterBaseFee = new BaseFeeEntity();
-        parnuScooterBaseFee.setCity("Pärnu");
-        parnuScooterBaseFee.setVehicleType("Scooter");
-        parnuScooterBaseFee.setBaseFee(2.5);
-
-        BaseFeeEntity parnuBikeBaseFee = new BaseFeeEntity();
-        parnuBikeBaseFee.setCity("Pärnu");
-        parnuBikeBaseFee.setVehicleType("Bike");
-        parnuBikeBaseFee.setBaseFee(2.0);
+        WeatherEntity entity = createWeatherEntity("Pärnu", 5, 5, "Heavy rain");
 
         when(weatherRepository.findLatestByStationName("Pärnu")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Pärnu", "Car")).thenReturn(Optional.of(parnuCarBaseFee));
@@ -771,27 +381,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Tallinn_Glaze() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Tallinn-Harku");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Glaze");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity tallinnCarBaseFee = new BaseFeeEntity();
-        tallinnCarBaseFee.setCity("Tallinn");
-        tallinnCarBaseFee.setVehicleType("Car");
-        tallinnCarBaseFee.setBaseFee(4.0);
-
-        BaseFeeEntity tallinnScooterBaseFee = new BaseFeeEntity();
-        tallinnScooterBaseFee.setCity("Tallinn");
-        tallinnScooterBaseFee.setVehicleType("Scooter");
-        tallinnScooterBaseFee.setBaseFee(3.5);
-
-        BaseFeeEntity tallinnBikeBaseFee = new BaseFeeEntity();
-        tallinnBikeBaseFee.setCity("Tallinn");
-        tallinnBikeBaseFee.setVehicleType("Bike");
-        tallinnBikeBaseFee.setBaseFee(3.0);
+        WeatherEntity entity = createWeatherEntity("Tallinn-Harku", 5, 5, "Glaze");
 
         when(weatherRepository.findLatestByStationName("Tallinn-Harku")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Tallinn", "Car")).thenReturn(Optional.of(tallinnCarBaseFee));
@@ -807,28 +397,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Tartu_Hail() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Tartu-Tõravere");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Hail");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity tartuCarBaseFee = new BaseFeeEntity();
-        tartuCarBaseFee.setCity("Tartu");
-        tartuCarBaseFee.setVehicleType("Car");
-        tartuCarBaseFee.setBaseFee(3.5);
-
-        BaseFeeEntity tartuScooterBaseFee = new BaseFeeEntity();
-        tartuScooterBaseFee.setCity("Tartu");
-        tartuScooterBaseFee.setVehicleType("Scooter");
-        tartuScooterBaseFee.setBaseFee(3.0);
-
-        BaseFeeEntity tartuBikeBaseFee = new BaseFeeEntity();
-        tartuBikeBaseFee.setCity("Tartu");
-        tartuBikeBaseFee.setVehicleType("Bike");
-        tartuBikeBaseFee.setBaseFee(2.5);
-
+        WeatherEntity entity = createWeatherEntity("Tartu-Tõravere", 5, 5, "Hail");
 
         when(weatherRepository.findLatestByStationName("Tartu-Tõravere")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Tartu", "Car")).thenReturn(Optional.of(tartuCarBaseFee));
@@ -844,27 +413,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_Parnu_Thunder() {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setStationName("Pärnu");
-        entity.setAirTemperature(5);
-        entity.setWindSpeed(5);
-        entity.setWeatherPhenomenon("Thunder");
-        entity.setTimestamp(LocalDateTime.now());
-
-        BaseFeeEntity parnuCarBaseFee = new BaseFeeEntity();
-        parnuCarBaseFee.setCity("Pärnu");
-        parnuCarBaseFee.setVehicleType("Car");
-        parnuCarBaseFee.setBaseFee(3.0);
-
-        BaseFeeEntity parnuScooterBaseFee = new BaseFeeEntity();
-        parnuScooterBaseFee.setCity("Pärnu");
-        parnuScooterBaseFee.setVehicleType("Scooter");
-        parnuScooterBaseFee.setBaseFee(2.5);
-
-        BaseFeeEntity parnuBikeBaseFee = new BaseFeeEntity();
-        parnuBikeBaseFee.setCity("Pärnu");
-        parnuBikeBaseFee.setVehicleType("Bike");
-        parnuBikeBaseFee.setBaseFee(2.0);
+        WeatherEntity entity = createWeatherEntity("Pärnu", 5, 5, "Thunder");
 
         when(weatherRepository.findLatestByStationName("Pärnu")).thenReturn(entity);
         when(baseFeeRepository.findByCityAndVehicleType("Pärnu", "Car")).thenReturn(Optional.of(parnuCarBaseFee));
@@ -885,11 +434,6 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_NoWeatherDataAvailable() {
-        BaseFeeEntity parnuCarBaseFee = new BaseFeeEntity();
-        parnuCarBaseFee.setCity("Pärnu");
-        parnuCarBaseFee.setVehicleType("Car");
-        parnuCarBaseFee.setBaseFee(3.0);
-
         assertThrows(IllegalStateException.class, () -> deliveryService.calculateTotalFee("Car", "Pärnu"));
     }
 }

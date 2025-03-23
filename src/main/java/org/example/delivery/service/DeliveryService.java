@@ -24,7 +24,7 @@ public class DeliveryService {
     public double calculateAirTemperatureFee(WeatherEntity entity) {
         if (entity.getAirTemperature() < -10) {
             return 1.0;
-        } else if (entity.getAirTemperature() < 0) {
+        } else if (entity.getAirTemperature() <= 0) {
             return 0.5;
         }
         return 0.0;
