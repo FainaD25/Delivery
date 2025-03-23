@@ -9,9 +9,8 @@ This is an application built with Java, Gradle and an in-memory H2 database. Thi
 * Spring Boot
 * Gradle - build tool
 * Lombok
-* Mapstruct
 * Liquibase
-* H2
+* H2 - database
 
 ## Prerequisites
 
