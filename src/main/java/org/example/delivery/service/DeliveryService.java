@@ -21,7 +21,7 @@ public class DeliveryService {
             "Pärnu", "Pärnu"
     );
 
-    public double calculateAirTemperatureFee(WeatherEntity entity) {
+    private double calculateAirTemperatureFee(WeatherEntity entity) {
         if (entity.getAirTemperature() < -10) {
             return 1.0;
         } else if (entity.getAirTemperature() <= 0) {
@@ -30,7 +30,7 @@ public class DeliveryService {
         return 0.0;
     }
 
-    public double calculateWindSpeedFee(WeatherEntity entity) {
+    private double calculateWindSpeedFee(WeatherEntity entity) {
         if (entity.getWindSpeed() > 20) {
             throw new IllegalArgumentException("Usage of selected vehicle type is forbidden");
         } else if (entity.getWindSpeed() >= 10) {
@@ -39,7 +39,7 @@ public class DeliveryService {
         return 0.0;
     }
 
-    public double calculateWeatherPhenomenonFee(WeatherEntity entity) {
+    private double calculateWeatherPhenomenonFee(WeatherEntity entity) {
         String phenomenon = entity.getWeatherPhenomenon().toLowerCase();
         if (phenomenon.contains("snow") || phenomenon.contains("sleet")) {
             return 1.0;
@@ -51,7 +51,7 @@ public class DeliveryService {
         return 0.0;
     }
 
-    public double calculateExtraFee(WeatherEntity entity, String vehicleType) {
+    private double calculateExtraFee(WeatherEntity entity, String vehicleType) {
         double fee = 0.0;
 
         if (!vehicleType.equalsIgnoreCase("CAR")) {
@@ -64,6 +64,7 @@ public class DeliveryService {
         return fee;
     }
 
+    // Calculate base fee and additional fees, add them together and return the result
     public double calculateTotalFee(String vehicleType, String city) {
         String stationName = cityStationNames.get(city);
         if (stationName == null) {

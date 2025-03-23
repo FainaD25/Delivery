@@ -33,7 +33,8 @@ public class WeatherDataFetcher {
         this.restTemplate = new RestTemplate();
     }
 
-    @Scheduled(cron = "0 15 * * * *")  // Runs every hour at HH:15:00
+    // Fetch weather info from weather api url every hour at HH:15:00
+    @Scheduled(cron = "0 15 * * * *")
     public void fetchWeatherData() {
         log.info("Fetching weather data at {}", System.currentTimeMillis());
         try {
@@ -44,6 +45,7 @@ public class WeatherDataFetcher {
         }
     }
 
+    // Retrieve required weather details from the response and save them to the database
     private void parseAndSaveWeatherData(String xmlResponse) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -70,6 +72,7 @@ public class WeatherDataFetcher {
         }
     }
 
+    // Helper function to retrieve text content from the tag of the element
     private String getTextValue(Element parent, String tagName) {
         NodeList nodeList = parent.getElementsByTagName(tagName);
         return nodeList.getLength() > 0 ? nodeList.item(0).getTextContent() : "";
