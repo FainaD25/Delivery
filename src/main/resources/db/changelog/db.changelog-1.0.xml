@@ -14,7 +14,7 @@
             <column name="air_temperature" type="DOUBLE"/>
             <column name="wind_speed" type="DOUBLE"/>
             <column name="weather_phenomenon" type="VARCHAR(255)"/>
-            <column name="observation_time" type="TIMESTAMP"/>
+            <column name="timestamp" type="TIMESTAMP"/>
         </createTable>
         <rollback>
             <dropTable tableName="weather_info"/>

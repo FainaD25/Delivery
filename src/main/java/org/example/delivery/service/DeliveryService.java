@@ -32,7 +32,7 @@ public class DeliveryService {
 
     public double calculateWindSpeedFee(WeatherEntity entity) {
         if (entity.getWindSpeed() > 20) {
-            throw new IllegalArgumentException("Usage of bike is forbidden due to high wind speed.");
+            throw new IllegalArgumentException("Usage of selected vehicle type is forbidden");
         } else if (entity.getWindSpeed() >= 10) {
             return  0.5;
         }
@@ -46,7 +46,7 @@ public class DeliveryService {
         } else if (phenomenon.contains("rain")) {
             return  0.5;
         } else if (phenomenon.contains("glaze") || phenomenon.contains("hail") || phenomenon.contains("thunder")) {
-            throw new IllegalArgumentException("Usage of selected vehicle type is forbidden due to extreme weather.");
+            throw new IllegalArgumentException("Usage of selected vehicle type is forbidden");
         }
         return 0.0;
     }
