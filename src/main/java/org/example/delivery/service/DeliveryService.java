@@ -67,7 +67,7 @@ public class DeliveryService {
     public double calculateTotalFee(String vehicleType, String city) {
         String stationName = cityStationNames.get(city);
         if (stationName == null) {
-            throw new IllegalArgumentException("Invalid city provided.");
+            throw new IllegalStateException("Invalid city provided.");
         }
 
         WeatherEntity latestWeather = weatherRepository.findLatestByStationName(stationName);

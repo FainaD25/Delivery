@@ -880,7 +880,7 @@ class DeliveryServiceTest {
 
     @Test
     void testCalculateFee_InvalidCity() {
-        assertThrows(IllegalArgumentException.class, () -> deliveryService.calculateTotalFee("Car", "Narva"));
+        assertThrows(IllegalStateException.class, () -> deliveryService.calculateTotalFee("Car", "Narva"));
     }
 
     @Test
